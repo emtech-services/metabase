@@ -131,6 +131,12 @@ class DashCard extends Component {
       ? { border: 0, background: "transparent", boxShadow: "none" }
       : null;
 
+    const height = this.props.printing && this.props.dashcard.card.display === 'table'
+    ? this.props.dashcardData[this.props.dashcard.id][
+        this.props.dashcard.card_id
+      ].row_count * 35 + 50
+    : "initial";
+
     return (
       <div
         className={cx(
@@ -142,12 +148,7 @@ class DashCard extends Component {
         )}
         style={{
           ...hideStyle,
-          pagePreakAfter: "always",
-          height: this.props.printing
-            ? this.props.dashcardData[this.props.dashcard.id][
-                this.props.dashcard.card_id
-              ].row_count * 35 + 50
-            : "initial",
+          height 
         }}
       >
         <Visualization

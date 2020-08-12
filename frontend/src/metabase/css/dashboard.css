@@ -331,6 +331,23 @@
     box-shadow: none;
     border-color: var(--color-border);
   }
+
+  .DashCard {
+    color: green !important;
+    position: relative !important;
+    top: 0px !important;
+    left: 0px !important;
+    page-break-after:always;
+  }
+
+  .footer { position: absolute; bottom: 0; }
+  .header { position: absolute; top: 0; }
+  
+  .DashboardGrid {
+    height: 5000px !important;
+    background-color: red !important;
+  }
+
   /* improve label contrast */
   .dc-chart .axis .tick text,
   .dc-chart .x-axis-label,
@@ -347,6 +364,10 @@
 @media print and (orientation: landscape) {
   html {
     width: 11in;
+  }
+
+  .DashCard {
+    width: 100% !important;
   }
 }
 
