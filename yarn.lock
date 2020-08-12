@@ -11514,6 +11514,11 @@ react-copy-to-clipboard@^5.0.1:
     copy-to-clipboard "^3"
     prop-types "^15.5.8"
 
+react-detect-print@0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/react-detect-print/-/react-detect-print-0.0.2.tgz#44ba5de07c835166e4f72332cda014c23732fdef"
+  integrity sha1-RLpd4HyDUWbk9yMyzaAUwjcy/e8=
+
 react-dnd-html5-backend@3:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/react-dnd-html5-backend/-/react-dnd-html5-backend-3.0.2.tgz#87172fd4be90e45353119b40e10f591ddf8661ed"

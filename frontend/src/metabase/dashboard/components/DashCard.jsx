@@ -17,7 +17,7 @@ import Icon from "metabase/components/Icon";
 import DashCardParameterMapper from "./DashCardParameterMapper";
 
 import { IS_EMBED_PREVIEW } from "metabase/lib/embed";
-
+import detectPrint from "react-detect-print";
 import cx from "classnames";
 import _ from "underscore";
 import { getIn } from "icepick";
@@ -32,7 +32,7 @@ const HEADER_ACTION_STYLE = {
   padding: 4,
 };
 
-export default class DashCard extends Component {
+class DashCard extends Component {
   static propTypes = {
     dashcard: PropTypes.object.isRequired,
     dashcardData: PropTypes.object.isRequired,
@@ -61,6 +61,7 @@ export default class DashCard extends Component {
   }
 
   render() {
+    console.log("dc props: ", this.props);
     const {
       dashcard,
       dashcardData,
@@ -126,6 +127,10 @@ export default class DashCard extends Component {
       !isEditing &&
       mainCard.visualization_settings["dashcard.background"] === false;
 
+    const hideStyle = hideBackground
+      ? { border: 0, background: "transparent", boxShadow: "none" }
+      : null;
+
     return (
       <div
         className={cx(
@@ -135,11 +140,15 @@ export default class DashCard extends Component {
             "Card--slow": isSlow === "usually-slow",
           },
         )}
-        style={
-          hideBackground
-            ? { border: 0, background: "transparent", boxShadow: "none" }
-            : null
-        }
+        style={{
+          ...hideStyle,
+          pagePreakAfter: "always",
+          height: this.props.printing
+            ? this.props.dashcardData[this.props.dashcard.id][
+                this.props.dashcard.card_id
+              ].row_count * 35 + 50
+            : "initial",
+        }}
       >
         <Visualization
           className="flex-full"
@@ -296,3 +305,5 @@ function getSeriesIconName(series) {
     return "bar";
   }
 }
+
+export default detectPrint(DashCard);

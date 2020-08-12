@@ -2,11 +2,11 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 
 import GridItem from "./GridItem";
-
+import detectPrint from "react-detect-print";
 import _ from "underscore";
 import { color } from "metabase/lib/colors";
 
-export default class GridLayout extends Component {
+class GridLayout extends Component {
   constructor(props, context) {
     super(props, context);
 
@@ -254,7 +254,7 @@ export default class GridLayout extends Component {
 
   render() {
     const { className, layout, cols, margin, isEditing } = this.props;
-
+    console.log('Printing: ', this.props.printing);
     const cellSize = this.getCellSize();
     let bottom = Math.max(...layout.map(l => l.y + l.h));
 
@@ -288,3 +288,5 @@ export default class GridLayout extends Component {
     );
   }
 }
+
+export default detectPrint(GridLayout);
