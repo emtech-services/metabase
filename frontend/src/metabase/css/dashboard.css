@@ -327,25 +327,38 @@
   nav {
     display: none;
   }
+
+  .DashboardGrid {
+    display: flex;
+    flex-direction: column;
+  }
+
   .DashCard .Card {
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
     box-shadow: none;
     border-color: var(--color-border);
   }
 
   .DashCard {
-    color: green !important;
     position: relative !important;
-    top: 0px !important;
-    left: 0px !important;
-    page-break-after:always;
+    top: 0 !important;
+    left: 0 !important;
+    page-break-after: always;
   }
 
-  .footer { position: absolute; bottom: 0; }
-  .header { position: absolute; top: 0; }
-  
-  .DashboardGrid {
-    height: 5000px !important;
-    background-color: red !important;
+  .footer {
+    position: absolute;
+    bottom: 0;
+  }
+  .header {
+    position: absolute;
+    top: 0;
   }
 
   /* improve label contrast */
@@ -366,9 +379,9 @@
     width: 11in;
   }
 
-  .DashCard {
+  /* .DashCard {
     width: 100% !important;
-  }
+  } */
 }
 
 @page {

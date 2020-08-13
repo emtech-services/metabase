@@ -37,6 +37,7 @@ import type {
   ParameterValues,
   ParameterOption,
 } from "metabase-types/types/Parameter";
+import detectPrint from "react-detect-print";
 
 type Props = {
   location: LocationDescriptor,
@@ -114,7 +115,7 @@ type State = {
 
 // NOTE: move DashboardControls HoC to container
 @DashboardControls
-export default class Dashboard extends Component {
+class Dashboard extends Component {
   props: Props;
   state: State = {
     error: null,
@@ -245,7 +246,39 @@ export default class Dashboard extends Component {
         />
       );
     }
-
+    const lineHeight = 30;
+    const printHeight =
+      this.props.dashcardData &&
+      this.props.dashboard &&
+      this.props.dashboard.ordered_cards
+        ? this.props.dashboard.ordered_cards.reduce((sum, card) => {
+            if (
+              this.props.dashcardData[card.id] &&
+              this.props.dashcardData[card.id][card.card_id]
+            ) {
+              return (sum += this.props.dashcardData[card.id][card.card_id]
+                .row_count);
+            }
+            return sum;
+          }, 0) *
+            lineHeight +
+          5000
+        : // Math.ceil(
+          //   this.props.dashboard.ordered_cards.reduce((sum, card) => {
+          //     if (
+          //       this.props.dashcardData[card.id] &&
+          //       this.props.dashcardData[card.id][card.card_id]
+          //     ) {
+          //       return (sum += this.props.dashcardData[card.id][card.card_id]
+          //         .row_count);
+          //     }
+          //     return sum;
+          //   }, 0) / 32,
+          // ) *
+          //   lineHeight *
+          //   5
+          "initial";
+    console.log("Print height", printHeight);
     return (
       <LoadingAndErrorWrapper
         className={cx("Dashboard flex-full pb4", {
@@ -271,7 +304,7 @@ export default class Dashboard extends Component {
                 {parametersWidget}
               </div>
             )}
-            <div className="wrapper">
+            <div className="wrapper" style={{ height: printHeight }}>
               {dashboard.ordered_cards.length === 0 ? (
                 <Box mt={[2, 4]} color={isNightMode ? "white" : "inherit"}>
                   <EmptyState
@@ -295,3 +328,5 @@ export default class Dashboard extends Component {
     );
   }
 }
+
+export default detectPrint(Dashboard);

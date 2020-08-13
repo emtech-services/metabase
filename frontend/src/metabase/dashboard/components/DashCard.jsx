@@ -41,6 +41,7 @@ class DashCard extends Component {
     markNewCardSeen: PropTypes.func.isRequired,
     fetchCardData: PropTypes.func.isRequired,
     navigateToNewCardFromDashboard: PropTypes.func.isRequired,
+    printHeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   };
 
   async componentDidMount() {
@@ -61,7 +62,6 @@ class DashCard extends Component {
   }
 
   render() {
-    console.log("dc props: ", this.props);
     const {
       dashcard,
       dashcardData,
@@ -131,11 +131,9 @@ class DashCard extends Component {
       ? { border: 0, background: "transparent", boxShadow: "none" }
       : null;
 
-    const height = this.props.printing && this.props.dashcard.card.display === 'table'
-    ? this.props.dashcardData[this.props.dashcard.id][
-        this.props.dashcard.card_id
-      ].row_count * 35 + 50
-    : "initial";
+    const printHeight = this.props.printing
+      ? { height: this.props.printHeight, position: "relative", top: 0, left: 0 }
+      : null;
 
     return (
       <div
@@ -148,7 +146,7 @@ class DashCard extends Component {
         )}
         style={{
           ...hideStyle,
-          height 
+          ...printHeight,
         }}
       >
         <Visualization
