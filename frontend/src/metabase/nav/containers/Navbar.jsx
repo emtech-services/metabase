@@ -154,7 +154,7 @@ class SearchBar extends React.Component {
             pl={1}
             ref={ref => (this.searchInput = ref)}
             value={searchText}
-            placeholder={t`Search` + "…"}
+            placeholder={""}
             onClick={() => this.setState({ active: true })}
             onChange={e => this.setState({ searchText: e.target.value })}
             onKeyPress={e => {

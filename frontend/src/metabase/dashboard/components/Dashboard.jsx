@@ -207,6 +207,60 @@ class Dashboard extends Component {
     });
   };
 
+  calculatePrintHeight() {
+    const lineHeight = 29;
+    const pageHeight = 981;
+    const pageHeader = 28;
+    const tableHeader = 38;
+    const rowsOnAPage = 32;
+
+    let rowSum = 0;
+    let chartsCount = 0;
+    let tablesCount = 0;
+    let additionalHeight = 0;
+    if (
+      this.props.dashcardData &&
+      this.props.dashboard &&
+      this.props.dashboard.ordered_cards
+    ) {
+      rowSum = this.props.dashboard.ordered_cards.reduce((sum, card) => {
+        if (
+          this.props.dashcardData[card.id] &&
+          this.props.dashcardData[card.id][card.card_id]
+        ) {
+          if (card.card.display === "table") {
+            tablesCount++;
+            additionalHeight +=
+              pageHeight -
+              (((this.props.dashcardData[card.id][card.card_id].row_count %
+                rowsOnAPage) *
+                lineHeight +
+                pageHeader) %
+                pageHeight);
+            return (sum += this.props.dashcardData[card.id][card.card_id]
+              .row_count);
+          } else {
+            chartsCount++;
+          }
+        }
+        return sum;
+      }, 0);
+    }
+    const contentHeight =
+      rowSum * lineHeight +
+      Math.ceil(rowSum / rowsOnAPage) * pageHeader +
+      additionalHeight +
+      tablesCount * tableHeader +
+      chartsCount * pageHeight;
+    const printHeight =
+      this.props.dashcardData &&
+      this.props.dashboard &&
+      this.props.dashboard.ordered_cards
+        ? 193 + contentHeight + (pageHeight - (contentHeight % pageHeight))
+        : "initial";
+    return printHeight;
+  }
+
   render() {
     let {
       dashboard,
@@ -221,7 +275,6 @@ class Dashboard extends Component {
     } = this.props;
     const { error } = this.state;
     isNightMode = isNightMode && isFullscreen;
-
     let parametersWidget;
     if (parameters && parameters.length > 0) {
       parametersWidget = (
@@ -246,39 +299,7 @@ class Dashboard extends Component {
         />
       );
     }
-    const lineHeight = 30;
-    const printHeight =
-      this.props.dashcardData &&
-      this.props.dashboard &&
-      this.props.dashboard.ordered_cards
-        ? this.props.dashboard.ordered_cards.reduce((sum, card) => {
-            if (
-              this.props.dashcardData[card.id] &&
-              this.props.dashcardData[card.id][card.card_id]
-            ) {
-              return (sum += this.props.dashcardData[card.id][card.card_id]
-                .row_count);
-            }
-            return sum;
-          }, 0) *
-            lineHeight +
-          5000
-        : // Math.ceil(
-          //   this.props.dashboard.ordered_cards.reduce((sum, card) => {
-          //     if (
-          //       this.props.dashcardData[card.id] &&
-          //       this.props.dashcardData[card.id][card.card_id]
-          //     ) {
-          //       return (sum += this.props.dashcardData[card.id][card.card_id]
-          //         .row_count);
-          //     }
-          //     return sum;
-          //   }, 0) / 32,
-          // ) *
-          //   lineHeight *
-          //   5
-          "initial";
-    console.log("Print height", printHeight);
+    const printHeight = this.calculatePrintHeight();
     return (
       <LoadingAndErrorWrapper
         className={cx("Dashboard flex-full pb4", {
@@ -319,6 +340,7 @@ class Dashboard extends Component {
                 <DashboardGrid
                   {...this.props}
                   onEditingChange={this.setEditing}
+                  printHeight={printHeight}
                 />
               )}
             </div>

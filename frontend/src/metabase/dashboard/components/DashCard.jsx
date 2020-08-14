@@ -131,9 +131,15 @@ class DashCard extends Component {
       ? { border: 0, background: "transparent", boxShadow: "none" }
       : null;
 
-    const printHeight = this.props.printing
-      ? { height: this.props.printHeight, position: "relative", top: 0, left: 0 }
-      : null;
+    const printHeight =
+      this.props.printing && this.props.printHeight
+        ? {
+            height: this.props.printHeight,
+            position: "relative",
+            top: 0,
+            left: 0,
+          }
+        : null;
 
     return (
       <div

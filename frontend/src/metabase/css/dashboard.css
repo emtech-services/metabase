@@ -89,9 +89,9 @@
   transition: background-color 1s linear, border 1s linear;
 }
 
-.DashboardGrid {
+/* .DashboardGrid {
   margin-top: 1em;
-}
+} */
 
 .DashCard {
   position: relative;

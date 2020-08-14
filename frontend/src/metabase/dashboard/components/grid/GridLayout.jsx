@@ -265,7 +265,9 @@ export default class GridLayout extends Component {
     }
 
     const width = cellSize.width * cols;
-    const height = cellSize.height * bottom;
+    const height = this.props.printHeight
+      ? this.props.printHeight
+      : cellSize.height * bottom;
     // subtract half of a margin to ensure it lines up with the edges
     return (
       <div

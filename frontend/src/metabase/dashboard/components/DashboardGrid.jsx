@@ -198,28 +198,13 @@ class DashboardGrid extends Component {
     this.setState({ addSeriesModalDashCard: dc });
   }
 
-  renderDashCard(dc, isMobile) {
-    const { width } = this.props;
-    const rowHeight = Math.floor(width / GRID_WIDTH / GRID_ASPECT_RATIO);
-
-    const height =
-      this.props.dashcardData && this.props.dashcardData.length
-        ? dc.card.display === "table"
-          ? this.props.dashcardData[dc.id][dc.card_id].row_count * rowHeight +
-            Math.ceil(
-              this.props.dashcardData[dc.id][dc.card_id].row_count / 32,
-            ) *
-              5 *
-              rowHeight
-          : 842
-        : "initial";
-
+  renderDashCard(dc, isMobile, printHeight) {
     return (
       <DashCard
         dashcard={dc}
         dashcardData={this.props.dashcardData}
         parameterValues={this.props.parameterValues}
-        printHeight={height}
+        printHeight={printHeight}
         slowCards={this.props.slowCards}
         fetchCardData={this.props.fetchCardData}
         markNewCardSeen={this.props.markNewCardSeen}
@@ -251,19 +236,11 @@ class DashboardGrid extends Component {
   renderMobile() {
     const { isEditing, isEditingParameter, width } = this.props;
     const { dashcards } = this.state;
-
-    const rowHeight = Math.floor(width / GRID_WIDTH / GRID_ASPECT_RATIO);
-    const printHeight =
-      this.props.printing && dashcards && dashcards.length
-        ? dashcards.reduce(
-            (sum, card) =>
-              (sum +=
-                this.props.dashcardData[card.id][card.card_id].row_count *
-                rowHeight),
-            0,
-          ) + 5000
-        : 0;
-
+    const lineHeight = 29;
+    const pageHeight = 981;
+    const pageHeader = 28;
+    const tableHeader = 38;
+    const rowsOnAPage = 32;
     return (
       <div
         className={cx("DashboardGrid", {
@@ -273,22 +250,34 @@ class DashboardGrid extends Component {
         })}
         style={{
           margin: 0,
-          height: this.props.printing ? printHeight : "initial",
+          height: this.props.printing ? this.props.printHeight : "initial",
         }}
       >
         {dashcards &&
-          dashcards.map(dc => {
+          dashcards.map((dc, index) => {
             const height =
               this.props.printing && dc.card.display === "table"
                 ? this.props.dashcardData[dc.id][dc.card_id].row_count *
-                    rowHeight +
+                    lineHeight +
+                  tableHeader +
                   Math.ceil(
-                    this.props.dashcardData[dc.id][dc.card_id].row_count / 32,
+                    this.props.dashcardData[dc.id][dc.card_id].row_count /
+                      rowsOnAPage,
                   ) *
-                    5 *
-                    rowHeight
+                    pageHeader +
+                  (pageHeight -
+                    ((this.props.dashcardData[dc.id][dc.card_id].row_count *
+                      lineHeight +
+                      tableHeader +
+                      Math.ceil(
+                        this.props.dashcardData[dc.id][dc.card_id].row_count /
+                          rowsOnAPage,
+                      ) *
+                        pageHeader) &
+                      pageHeight) -
+                    (index === 0 ? 193 : 0))
                 : this.props.printing && dc.card.display !== "table"
-                ? 842
+                ? pageHeight - (index === 0 ? 193 : 0)
                 : dc.card.display === "text"
                 ? MOBILE_TEXT_CARD_ROW_HEIGHT * dc.sizeY
                 : width / MOBILE_ASPECT_RATIO;
@@ -297,13 +286,13 @@ class DashboardGrid extends Component {
                 key={dc.id}
                 className="DashCard"
                 style={{
-                  width: width,
+                  width,
                   marginTop: 10,
                   marginBottom: 10,
                   height,
                 }}
               >
-                {this.renderDashCard(dc, true)}
+                {this.renderDashCard(dc, true, height)}
               </div>
             );
           })}
@@ -315,37 +304,6 @@ class DashboardGrid extends Component {
     const { dashboard, isEditing, isEditingParameter, width } = this.props;
     const rowHeight = Math.floor(width / GRID_WIDTH / GRID_ASPECT_RATIO);
 
-    const lineHeight = 30;
-    const printHeight =
-      this.props.printing && this.props.dashboard.ordered_cards
-        ? this.props.dashboard.ordered_cards.reduce((sum, card) => {
-            if (
-              this.props.dashcardData[card.id] &&
-              this.props.dashcardData[card.id][card.card_id]
-            ) {
-              return (sum += this.props.dashcardData[card.id][card.card_id]
-                .row_count);
-            }
-            return sum;
-          }, 0) *
-            30 +
-          5000
-        : // Math.ceil(
-          //   this.props.dashboard.ordered_cards.reduce((sum, card) => {
-          //     if (
-          //       this.props.dashcardData[card.id] &&
-          //       this.props.dashcardData[card.id][card.card_id]
-          //     ) {
-          //       return (sum += this.props.dashcardData[card.id][card.card_id]
-          //         .row_count);
-          //     }
-          //     return sum;
-          //   }, 0) / 32,
-          // ) *
-          //   lineHeight *
-          //   5
-          0;
-
     return (
       <GridLayout
         className={cx("DashboardGrid", {
@@ -354,7 +312,7 @@ class DashboardGrid extends Component {
           "Dash--dragging": this.state.isDragging,
         })}
         layout={this.state.layout}
-        printHeight={printHeight}
+        printHeight={this.props.printHeight}
         cols={GRID_WIDTH}
         margin={GRID_MARGIN}
         rowHeight={rowHeight}
@@ -371,7 +329,7 @@ class DashboardGrid extends Component {
               onMouseDownCapture={this.onDashCardMouseDown}
               onTouchStartCapture={this.onDashCardMouseDown}
             >
-              {this.renderDashCard(dc, false)}
+              {this.renderDashCard(dc, false, null)}
             </div>
           ))}
       </GridLayout>
@@ -380,43 +338,13 @@ class DashboardGrid extends Component {
 
   render() {
     const { width } = this.props;
-    const { dashcards } = this.state;
-    const lineHeight = 30;
-
-    const printHeight =
-      this.props.printing && dashcards
-        ? dashcards.reduce((sum, card) => {
-            if (
-              this.props.dashcardData[card.id] &&
-              this.props.dashcardData[card.id][card.card_id]
-            ) {
-              return (sum += this.props.dashcardData[card.id][card.card_id]
-                .row_count);
-            }
-            return sum;
-          }, 0) *
-            lineHeight +
-          5000
-        : // Math.ceil(
-          //   dashcards.reduce((sum, card) => {
-          //     if (
-          //       this.props.dashcardData[card.id] &&
-          //       this.props.dashcardData[card.id][card.card_id]
-          //     ) {
-          //       return (sum += this.props.dashcardData[card.id][card.card_id]
-          //         .row_count);
-          //     }
-          //     return sum;
-          //   }, 0) / 32,
-          // ) *
-          //   lineHeight *
-          //   5
-          0;
 
     return (
       <div
         className="flex layout-centered"
-        style={{ height: this.props.printing ? printHeight : "initial" }}
+        style={{
+          height: this.props.printing ? this.props.printHeight : "initial",
+        }}
       >
         {width === 0 ? (
           <div />
