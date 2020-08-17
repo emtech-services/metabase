@@ -208,11 +208,12 @@ class Dashboard extends Component {
   };
 
   calculatePrintHeight() {
+    const pageHeight = 971;
+    const mainHeader = 129;
+    const rowsOnAPage = 32;
     const lineHeight = 29;
-    const pageHeight = 981;
     const pageHeader = 28;
     const tableHeader = 38;
-    const rowsOnAPage = 32;
 
     let rowSum = 0;
     let chartsCount = 0;
@@ -256,8 +257,12 @@ class Dashboard extends Component {
       this.props.dashcardData &&
       this.props.dashboard &&
       this.props.dashboard.ordered_cards
-        ? 193 + contentHeight + (pageHeight - (contentHeight % pageHeight))
+        ? mainHeader +
+          contentHeight +
+          (pageHeight - (contentHeight % pageHeight))
         : "initial";
+    console.log("Dashboard printing", this.props.printing);
+    console.log("Dashboard printHeight", printHeight);
     return printHeight;
   }
 

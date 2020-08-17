@@ -328,10 +328,10 @@
     display: none;
   }
 
-  .DashboardGrid {
+  /* .DashboardGrid {
     display: flex;
     flex-direction: column;
-  }
+  } */
 
   .DashCard .Card {
     position: relative !important;

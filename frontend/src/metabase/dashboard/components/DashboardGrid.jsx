@@ -233,14 +233,39 @@ class DashboardGrid extends Component {
     );
   }
 
+  calculatePrintHeight(dashCard, index) {
+    const pageHeight = 971;
+    const mainHeader = 129;
+    const rowsOnAPage = 32;
+    const lineHeight = 29;
+    const pageHeader = 28;
+    const tableHeader = 38;
+
+    let rowCount = 0;
+    if (
+      this.props.dashcardData &&
+      this.props.dashcardData[dashCard.id] &&
+      this.props.dashcardData[dashCard.id][dashCard.card_id]
+    ) {
+      rowCount = this.props.dashcardData[dashCard.id][dashCard.card_id]
+        .row_count;
+    }
+    const contentHeight =
+      dashCard.card.display === "table"
+        ? rowCount * lineHeight +
+          tableHeader +
+          Math.ceil(rowCount / rowsOnAPage) * pageHeader
+        : pageHeight;
+    const printHeight =
+      dashCard.card.display === "table"
+        ? contentHeight + (pageHeight - (contentHeight % pageHeight))
+        : contentHeight;
+    return printHeight - (index === 0 ? mainHeader : 0);
+  }
+
   renderMobile() {
     const { isEditing, isEditingParameter, width } = this.props;
     const { dashcards } = this.state;
-    const lineHeight = 29;
-    const pageHeight = 981;
-    const pageHeader = 28;
-    const tableHeader = 38;
-    const rowsOnAPage = 32;
     return (
       <div
         className={cx("DashboardGrid", {
@@ -255,32 +280,11 @@ class DashboardGrid extends Component {
       >
         {dashcards &&
           dashcards.map((dc, index) => {
-            const height =
-              this.props.printing && dc.card.display === "table"
-                ? this.props.dashcardData[dc.id][dc.card_id].row_count *
-                    lineHeight +
-                  tableHeader +
-                  Math.ceil(
-                    this.props.dashcardData[dc.id][dc.card_id].row_count /
-                      rowsOnAPage,
-                  ) *
-                    pageHeader +
-                  (pageHeight -
-                    ((this.props.dashcardData[dc.id][dc.card_id].row_count *
-                      lineHeight +
-                      tableHeader +
-                      Math.ceil(
-                        this.props.dashcardData[dc.id][dc.card_id].row_count /
-                          rowsOnAPage,
-                      ) *
-                        pageHeader) &
-                      pageHeight) -
-                    (index === 0 ? 193 : 0))
-                : this.props.printing && dc.card.display !== "table"
-                ? pageHeight - (index === 0 ? 193 : 0)
-                : dc.card.display === "text"
-                ? MOBILE_TEXT_CARD_ROW_HEIGHT * dc.sizeY
-                : width / MOBILE_ASPECT_RATIO;
+            const height = this.props.printing
+              ? this.calculatePrintHeight(dc, index)
+              : dc.card.display === "text"
+              ? MOBILE_TEXT_CARD_ROW_HEIGHT * dc.sizeY
+              : width / MOBILE_ASPECT_RATIO;
             return (
               <div
                 key={dc.id}
@@ -322,16 +326,21 @@ class DashboardGrid extends Component {
         isEditing={isEditing}
       >
         {dashboard &&
-          dashboard.ordered_cards.map(dc => (
-            <div
-              key={dc.id}
-              className="DashCard"
-              onMouseDownCapture={this.onDashCardMouseDown}
-              onTouchStartCapture={this.onDashCardMouseDown}
-            >
-              {this.renderDashCard(dc, false, null)}
-            </div>
-          ))}
+          dashboard.ordered_cards.map((dc, index) => {
+            // const height = this.calculatePrintHeight(dc, index);
+            // console.log("renderGrid", height);
+            return (
+              <div
+                key={dc.id}
+                className="DashCard"
+                onMouseDownCapture={this.onDashCardMouseDown}
+                onTouchStartCapture={this.onDashCardMouseDown}
+                // style={{ height }}
+              >
+                {this.renderDashCard(dc, false, null)}
+              </div>
+            );
+          })}
       </GridLayout>
     );
   }
